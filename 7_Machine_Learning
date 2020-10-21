@@ -1,0 +1,247 @@
+#Acesse os arquivos desse repositório:
+#Estados.xls <https://bit.ly/3kpClY0>
+#regressao.csv <shorturl.at/kvyL9>
+
+---
+title: "7 | Machine_Learning"
+output: html_notebook
+---
+
+```{r}
+# 7 | Machine Learning
+
+print("Em machine learning vamos aplicar algumas técnicas de árvore de decisões e previsões a partir de dados estatísticos em conjunto com uma construção de modelos e regressão linear possíveis procurando automatizar o entendimento com machine learning se baseando em dados. Além disso, vamos trazer novas ferramentas estátisticas para testagem dos nosso resultados como valor-P e anova.")
+
+print("Como introdução a regressão vamos exportar nesse experimento uma base de dados com informações que configuram de fato o índice IDH de um país como, índice de educação, longevidade e renda. No caso vamos trabalhar com analfabetismo, expectativa de vida e PIB per capita do Brasil como se pode ver na tabela e gráfico a seguir:")
+```
+
+```{r}
+library(tidyverse)
+library(ggpubr)
+
+brasil = read_csv("regressao.csv")
+brasil
+```
+
+```{r}
+grafico = ggplot(brasil, aes(x=Ano, y=Taxa_Analfabetismo, group=1)) +
+          geom_point(color='firebrick3') +
+          geom_line(color='firebrick3', linetype='dashed') +
+          geom_smooth() +
+          labs(title = "Regressão Linear", subtitle = "Taxa de Analfabetismo", x = "Período", y = "% Analfabetismo")
+
+grafico2 = ggplot(brasil, aes(x=Ano, y=Expectativa_de_Vida, group=1)) +
+          geom_point(color='firebrick3') +
+          geom_line(color='firebrick3', linetype='dashed') +
+          geom_smooth() +
+          labs(title = "Ascensão Linear", subtitle ="Expectativa de Vida", x = "Período", y = "Idade")
+
+grafico3 = ggplot(brasil, aes(x=Ano, y=IDH, group=1)) +
+          geom_point(color='firebrick3') +
+          geom_line(color='firebrick3', linetype='dashed') +
+          geom_smooth() +
+          labs(title = "Encaixe ruim", subtitle = "IDH brasileiro", x = "Período", y = "IDH")
+
+grafico4 = ggplot(brasil, aes(x=Ano, y=PIB_per_capita, group=1)) +
+          geom_point(color='firebrick3') +
+          geom_line(color='firebrick3', linetype='dashed') +
+          geom_smooth() +
+          labs(title = "Regressão Polinomial", subtitle = "Produto Interno Bruto brasileiro per capita", x ="Período", y="Per Capita")
+
+ggarrange(grafico, grafico2, grafico3, grafico4, ncol = 2, nrow = 2)
+```
+
+```{r}
+print("Fonte: https://www.w3schools.com/python/python_ml_linear_regression.asp")
+
+print("Uma regrassão linear em machine learning é quando o gráfico mostra uma tendência para declínio da sua linha de dados. Nesse caso, foi criado um gráfico com os índices de analfabetismo no Brasil estruturando com as ferramentas disponíveis em R. Já ascensão linear é o oposto, ele faz uma leitura do gráfico de crescimento. Com isso, podemos trabalhar com os dados de expectativa de vida no Brasil.")
+
+print("Nem todos os gráficos vão ter uma tendência clara de crescimento ou declínio, nesse caso teremos um encaixe ruim que impossibilita fazer quaisquer previsões devido a sua instabilidade. Como podemos ver nos dados de índice do IDH brasileiro que já atingiu um patamar de alto índice de desenvolvimento humano até 2010 quando fizeram uma reforma na contabilização do dado, onde se avaliaram novos indicadores sobre educação, expectativa de vida e renda dos países.")
+
+print("Em outros casos, vamos ter a regressão polinomial que é uma variação maior da tendência dos dados. Nesse caso, diferentemente do encaixe ruim com a regressão polinominal podemos tirar algumas conclusões dos dados de sazonalidade ou outros aspectos.")
+
+# Machine Learning
+
+print("Após essa introdução de tendência, vamos começar construindo nosso modelo de machine learning através de uma hipótese: É possível criar um modelo com machine learning que classifique automaticamente os continentes por índice IDH? Pra isso, temos que utilizar algumas novas bibliotecas para fazer os modelos de previsão, gráfico e árvore de decisão com 'rpart' e 'rpart.plot'.")
+```
+
+```{r}
+library(rpart)
+library(rpart.plot)
+library(readxl)
+
+estados = read_excel("Estados.xls")
+head(estados)
+str(estados)
+```
+
+```{r}
+print("Observe pela função 'str()' que a estrutura do banco de dados está alocada para caráter e valores númericos. Porém, para se criar um modelo mais acertivo temos que mudar com 'as.factor()' os caracteres e se fosse necessário os valores númericos para 'as.numeric()' igualmente, visto que o modelo de previsão trabalha melhor com esses dois tipos de estruturas.")
+```
+
+```{r}
+estados$Países = as.factor(estados$Países)
+estados$Capital = as.factor(estados$Capital)
+estados$Continente = as.factor(estados$Continente)
+
+str(estados)
+```
+
+```{r}
+print("Antes de dar ínicio ao nosso modelo de previsão, temos que primeiro separar nossos dados em duas importantes categorias de dados, em população e amostragem. Pois, podemos utilizá-los posteriormente para testagem dos resultados.")
+```
+
+```{r}
+set.seed(123)
+
+randomico = sample(1:length(estados$Continente), length(estados$Continente)*0.75) 
+randomico
+
+pop = estados[randomico,]
+head(pop)
+
+teste = estados[-randomico,]
+head(teste)
+```
+
+```{r}
+print("Nesse código implementamos uma 'set.seed()' apenas para termos como base o mesmo resultado, caso não tivéssemos uma seed, para cada execução do código teriamos um resultado diferente. Ainda no código, procuramos trazer um fator randômico para separação dos dados nas duas categorias como uma forma de não produzir ambiguidades, sendo que pegamos o tamanho de 75% da coluna continentes disponíves para população e o restante para testes.")
+
+print("Feito isso, podemos agora começar a construção do nosso modelo de árvore de decisões, é possível que a máquina aprenda diferenciar um continente do outro pelo índice de IDH?")
+```
+
+```{r}
+modelo = rpart(IDH ~ Continente, data=pop, cp=0)
+modelo
+
+rpart.plot(modelo, main="Classificação IDH Machine Learning dos Continentes", type=5, extra=101, box.palette = "RdYlGn")
+```
+
+```{r}
+print("Fonte: <http://www.milbo.org/rpart-plot/prp.pdf>")
+
+print("Com o modelo construído, temos detalhado no console todo o processo de decisão que fez a máquina classificar os continentes por IDH sendo que cada asterisco é uma caixa de decisão. Ainda temos o recurso em 'rpart.plot()' para sairmos apenas da visão do código e trazer essa informação para gráfico. Na árvore de decisão temos que a máquina atribuiu os índices IDH de classificação, assim como números de dados avaliados e sua representação porcentual.")
+
+print("Agora com esse modelo o que podemos fazer é testar com a realidade o pensamento da máquina, será que os resultados batem com a previsão?")
+
+# Testagem
+
+print("Na testagem, vamos utilizar a amostragem que separamos inicialmente visto que os dados da população foram usado para criação do modelo de árvore de decisões, podemos agora pegar a outra parcela dos dados para identificar a veracidade dos dados e confirmar nossa previsão.")
+```
+
+```{r}
+teste$Previsao = predict(modelo, teste)
+teste$Previsao = round(teste$Previsao,3)
+teste$Margem_Erro = teste$IDH - teste$Previsao
+teste$Margem_Erro = abs(teste$Margem_Erro)
+selecao = teste %>% select(-Capital,-PIB)
+head(selecao)
+```
+
+```{r}
+print("Na nossa tabela criamos duas novas colunas de 'Previsão' e 'Margem de Erro' e ocultamos as demais. Com elas usamos a função 'predict()' de 'rpart' para avaliar melhor os resultados obtidos, como pode ser visto o machine learning associou aos continentes valores fixos em previsão provavelmente pela associação comum de resultados atribuindo esse valor aos continentes. Em conjunto, podemos criar uma margem de erro que pode ser tanto para maior quanto para menor do resultados real.")
+
+print("Conseguimos observar melhor se a margem de erro está muito fora da tomada de decisão correta por meio do uso do sumário, que vamos ver a seguir:")
+```
+
+```{r}
+sumario_margem = summary(teste$Margem_Erro)
+sumario_margem
+
+desvio_erro = sd(teste$Margem_Erro)
+desvio_erro
+```
+
+```{r}
+print("No sumário da margem de erro, observamos um sinal de alerta que os valores estão muito próximos de duas casas decimais mostrando assim uma taxa de erro média. Então, segundo o sumário observamos que o valor com menor erro no modelo de teste teve uma variação de apenas 0.005 decimais, ou 0,5% do seu valor real e assim por diante onde a pior previsão foi da máxima com 0.254 ou 25% de erro. Nesse caso, podemos concluir que a margem de erro poderia ser considerada pelo desvio padrão de 0.0578 ou 6% do valor real para o modelo de previsão. ")
+
+# Valor-P
+
+print("Valor-P é um teste utilizado em estatística que procura identificar se a análise de dados é passível de uma hipótese nula, ou seja, um cruzamento de dados que não tem relação direta com a proposta inicial. Pra isso existe também a hipótese alternativa que surge como novo argumento caso a hipótese nula ocorrer, podendo refutar ou até mesmo acrescentar uma nova vertente na hipótese.")
+
+print("Sabendo disso, vamos avaliar se a nossa previsão pode ser considerada uma hipótese nula:")
+```
+
+```{r}
+valor_P = t.test(teste$Previsao, teste$IDH)
+valor_P
+```
+
+```{r}
+print("O teste mostra um valor-p com chance de erro de 77% o que significa que a tese de hipótese nula foi aceita, levando em conta por base científica que os valores de erro abaixo de até 5% na amostragem constituem uma hipótese aceita de relação. Sendo assim, a nossa previsão de classificar os continentes por índice de IDH é mais falha do que acertada, portanto a hipótese alternativa é que o modelo de relação entre continentes e seus índices de IDH não comprovam de fato seu continente, por exemplo, segundo o valor-p existe uma chance de que países africanos terem índices IDH maiores do que os europeus.") 
+
+print("Prova dessa afirmação é que países africanos como Argélia (0.759) e Túnisa (0.739) terem índices melhores que países europeus como Kosovo (0.739) e Moldávia (0.711), então assumir que apenas por índicadores de desenvolvimento humano podemos concluir qual continente um país pertence é uma teoria descartada.")
+
+# Anova
+
+print("Anova faz parte da estatística F onde procura encontrar as médias dos mais diferentes grupos de amostragem, determinando portanto sua correlação de variância nos resultados. Logo, com anova procuramos identificar se existe igualdade na variância dos dados pegando amostragens desses diferentes grupos, encontrando uma associação lógica para o uso dos dados.")
+
+print("Para dar sequência no nosso experimento, vamos primeiro criar um dataset randômico entre as classificações do IDH feito pela PNUD responsável pela contabilidade dos índices de desenvolvimento humano no mundo e procurar uma relação de igualdade entre os diferentes grupos usando o anova.")
+```
+
+```{r}
+Class = rep(c("IDH muito alto","IDH alto","IDH médio", "IDH baixo"),each=10)
+IDH = round(c(rnorm(10,0.850,0.020),rnorm(10,0.730,0.030),rnorm(10,0.630,0.040), rnorm(10,0.450,0.050)),3)
+
+dados = data.frame(Class,IDH)
+dados
+```
+
+```{r}
+print("Criado o dataset vamos procurar identificar se existe alguma relação de igualdade entre os grupos de IDH muito alto, alto, médio ou baixo que possam valer como característica, por exemplo, por meio do anova comprovaremos se grupos de alta se comportam de forma muito diferentes dos grupos de baixa. Levando em conta que anova também trabalha com hipóteses nulas, portanto, pode ser um fato ou pode exister uma outra hipótese alternativa por trás.")
+```
+
+```{r}
+anova = aov(IDH ~ Class, data=dados)
+anova
+
+summary(anova)
+```
+
+```{r}
+print("Agora com o valor F calculado e anova pronta podemos concluir pelo resultado que o valor F ficou muito acima de uma característica comum das médias dos grupos, até mesmo porque são grupos de IDH totalmente distintos, mas podemos comprovar essa realidade utilizando ferramentas gráficas para mostrar os cálculos das médias e margem de erro desses grupos.")
+```
+
+```{r}
+medias = round(with(dados,tapply(IDH,Class,mean)),3)
+medias
+
+margem_erro = round(with(dados,tapply(IDH,Class,function(x) sqrt(var(x)/length(x)))),3)
+margem_erro
+```
+
+
+```{r}
+grafico5 = barplot(medias,beside=TRUE,ylim=c(0,1),main="Comportamento de grupos e médias IDH",ylab="IDH",xlab="Classificação PNUD", col="steelblue", border="black")
+           arrows(x0=grafico5,y0=medias-margem_erro, x1=grafico5,y1=medias+margem_erro,angle=90,length=0.2,code=3,col="firebrick3")   
+```
+
+```{r}
+print("Fonte: <https://rpubs.com/paternogbc/46748>")
+
+print("Com o gráfico fica mais fácil compreender o comportamento desses grupos e verificar de fato que não possuem relação direta, portanto aceitando mais uma vez a hipótese alternativa de que uma população de países não possuem características variantes semelhantes de IDH comprovando que a classificação da PNUD se faz necessária para separação destes em índices de desenvolvimento distintos. Existe também, outra ferramenta técnica de comparação que podemos ver no seguinte teste 'TukeyHSD()':")
+```
+
+```{r}
+Tukey = TukeyHSD(anova)
+Tukey 
+
+plot(Tukey)
+```
+
+```{r}
+print("Com o teste Tukey fica mais claro identificar as diferenças e relação entre cada um dos grupos. E por fim, temos a avaliação final dos resultados dos dados onde podemos indentificar sua curva de regressão e tendências com a função 'par()'.")
+```
+
+```{r}
+par(mfrow=c(2,2))
+plot(anova)
+```
+
+```{r}
+print("Fonte: <https://rpubs.com/paternogbc/46748>")
+
+print("Qual seria sua avaliação? Talvez um encaixe ruim com regressão linear? Bem provável, visto os resultados anteriores com anova.")
+
+print("Por fim gostaria de agrader a paciência e atenção do leitor que chegou até aqui e espero ter conseguido passar um pouco dos meus conhecimentos com a linguaguem. Concluo portanto o projeto R, e vejo vocês em uma nova oportunidade.")
+```
