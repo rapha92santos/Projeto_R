@@ -1,0 +1,168 @@
+---
+title: "2_Banco_de_dados_em_R"
+output: html_notebook
+---
+
+```{r}
+# 2 | Banco de dados em R
+
+print("Neste próximo passo, vamos criar, modificar e salvar um banco de dados dentro da linguaguem R.")
+
+print("Primeiro passo é verificar se a biblioteca 'data.table()' está instalada, nela existem ferramentas necessárias com as funções que iremos utilizar, assim como 'tidyverse':")
+```
+
+```{r}
+library(tidyverse)
+
+#Versão Rstudio
+#install.packages("data.table")
+library(data.table)
+```
+
+```{r}
+# Data.table, Mutate, Save, Write, Load, Join, Rbind, Transmute, Rename
+
+print("Feito isso, agora vamos combinar o uso de 'data.table()' com vetor 'c()' que irá armazenar nossos dados:")
+```
+
+```{r}
+library(data.table)
+
+ibge_exporta = data.table(
+ titulo = c("Exportação"),
+ primeiro_tri_19 = c(232818), 
+ segundo_tri_19 = c(263380), 
+ terceiro_tri_19 = c(272964), 
+ quarto_tri_19 = c(270205))
+
+ibge_exporta
+
+ibge_importa = data.table(
+ titulo = c("Importação"),
+ primeiro_tri_19 = c(239888), 
+ segundo_tri_19 = c(253994), 
+ terceiro_tri_19 = c(292990), 
+ quarto_tri_19 = c(276573))
+
+ibge_importa
+```
+
+```{r}
+print("Fonte: <https://bit.ly/347uh73>")
+
+print("Com a tabela criada, no entanto, poderiamos acrescentar alguns dados faltantes como o consolidado do ano todo e porque não a média da balança comercial?:")
+```
+
+```{r}
+exporta = ibge_exporta %>%
+  mutate(ano_2019 = (primeiro_tri_19 + segundo_tri_19 + terceiro_tri_19 + quarto_tri_19),
+         ano_2019_media = ano_2019 / 4)
+exporta
+
+importa = ibge_importa %>%
+  mutate(ano_2019 = (primeiro_tri_19 + segundo_tri_19 + terceiro_tri_19 + quarto_tri_19),
+         ano_2019_media = ano_2019 / 4)
+importa
+```
+
+```{r}
+print("O uso do pipe ou '%>%' ajuda a retomar um argumento anterior, ou seja, atribuí a função 'mutate()' ao argumento 'ibge_'. Vamos agora salvar esses dados para podermos ter um backup caso alguma coisa na edição dê errado utilizando a função 'save()' pré-existente na linguaguem R:")
+```
+
+```{r}
+save(exporta, file = "exporta.Rda")
+save(importa, file = 'importa.Rda')
+```
+
+```{r}
+print("Vale lembrar que as extensões em R funcionam melhor por serem um recurso dentro do próprio programa. Para outras extensões, poderiamos usar o 'readr' com a função 'write_()', porém mesmo com ele alguns dados podem vir desconfigurados como acentos ou vírgulas.")
+```
+
+```{r}
+write_csv(exporta,'exporta.csv')
+write_csv(importa,'importa.csv')
+```
+
+```{r}
+print("Caso fosse necessário usariamos os arquivos salvos, podendo usar a função 'load()' com o nome do arquivo e extensão.")
+```
+
+```{r}
+load('exporta.Rda')
+load('importa.Rda')
+```
+
+```{r}
+print("Para o próximo passo, vamos utilizar o 'full_join()' para consolidarmos os dados de exportação e importação em uma balança comercial.")
+```
+
+```{r}
+balanca_comercial = exporta %>% 
+ full_join(importa) 
+
+balanca_comercial
+```
+
+```{r}
+print("Com isso, fica visualmente mais compreensível os dados, porém poderíamos acrescentar mais uma linha na tabela com 'data.frame()' e 'rbind()' mostrando o saldo de cada coluna, afinal como está o resultado do balanço?")
+```
+
+```{r}
+saldo_primeiro = 232818 - 239888
+
+saldo_segundo = 263380 - 253994
+
+saldo_terceiro = 272964 - 292990
+
+saldo_quarto = 270205 - 276573
+
+saldo_ano = 1039367 - 1063445
+
+saldo_media = 259841.8 - 265861.2
+
+saldo = data.frame("Saldo", saldo_primeiro, saldo_segundo, saldo_terceiro, saldo_quarto, saldo_ano, saldo_media)  
+saldo
+
+names(saldo) = c("titulo", "primeiro_tri_19", "segundo_tri_19", "terceiro_tri_19", "quarto_tri_19", "ano_2019", "ano_2019_media")
+
+novo_balanco_comercial = rbind(balanca_comercial, saldo)
+novo_balanco_comercial
+```
+
+```{r}
+print("Fonte: <https://bit.ly/3mZxEpf>")
+
+print("Deu pra notar agora com maior clareza que as importações estão superando as exportações. Mas, podemos modificar nossa tabela também para semestres usando o 'trasnmute()', qual seria esse saldo?")
+```
+
+```{r}
+editar = novo_balanco_comercial %>%
+   transmute(titulo = titulo,
+             semestre_1 = (primeiro_tri_19 + segundo_tri_19),
+             semestre_2 = (terceiro_tri_19 + quarto_tri_19),
+             ano_2019 = ano_2019,
+             ano_2019_media = ano_2019_media)
+
+editar
+```
+
+```{r}
+print("Dá pra ver que os 6 primeiros meses de 2019 mostram um resultado primário positivo, o problema realmente aparece na balança comercial durante o 2º semestre. Por fim, podemos renomear o nome das colunas para algo mais amigável utilizando a função 'rename()'.")
+```
+
+```{r}
+renomear = novo_balanco_comercial %>%
+ rename("Balança_comercial" = titulo,
+        "1T19" = primeiro_tri_19,
+        "2T19" = segundo_tri_19,
+        "3T19" = terceiro_tri_19,
+        "4T19" = quarto_tri_19,
+        "Consolidado_2019" = ano_2019,
+        "Média_2019" = ano_2019_media)
+
+renomear
+```
+
+```{r}
+print("Com isso, concluímos aqui nossa criação do banco de dados em R, a seguir vamos explorar mais a formatação e integridade das informações.")
+```
