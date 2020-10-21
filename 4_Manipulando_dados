@@ -1,0 +1,100 @@
+#Acesse o arquivo desse repositório
+#Estados.xls <https://bit.ly/3kpClY0>
+
+---
+title: "4_Manipulando_dados"
+output: html_notebook
+---
+
+```{r}
+# 4 | Manipulando dados
+
+print("Nesse segmento vamos falar sobre a manipulação e organização de uma base de dados utilizando R. Vamos importar e manipular um base de dados pré-existente, com apoio de uma biblioteca e ferramentas de tratamento de dados disponíveis na linguaguem.")
+
+print("Como de costume, o primeiro passo é verificar as bibliotecas disponíveis, por outro lado, vamos instalar outra bilioteca o 'readxl' que é um leitor de dados focado em extensão '.xls' para planilhas em excel. Sendo que a base de dados que iremos utilizar foi retirada de um banco de dados SQL Microsoft.")
+
+print("Nele veremos uma base de dados com todos os países, respectivamente com um código de identificação (ID), nome, capital, IDH com valores que compreendem de 0 até 1, PIB com paridade do poder de compra em milhões de dólares e continente.")
+```
+
+```{r}
+library(tidyverse)
+
+#install.packages("readxl")
+library(readxl)
+
+estados = read_excel("Estados.xls")
+estados
+```
+```{r}
+# Head, Tail, Colnames
+
+print("Vamos agorar manipular essa base com o 'tidyverse', usando 'head()', 'tail()' e 'colnames()':")
+```
+
+```{r}
+head(estados)
+tail(estados)
+colnames(estados)
+```
+
+```{r}
+print("Usando 'head()' exibe os primeiros dados da tabela, já 'tail()' mostra os últimos dados. 'colnames()' é uma forma útil de verificar os nomes das colunas que serão utilizadas na programação.")
+
+#Summary
+
+print("'summary()' é um resumo geral da sua base, trazendo informações relevantes como valor mínimo, máxima, média, mediana, quartis, modo, extensão e classe.")
+```
+
+```{r}
+sumario = estados %>% 
+ summary(estados) 
+sumario
+```
+
+```{r}
+print("A função 'group_by()' organiza os dados com que você quer trabalhar em contrapartida com o 'summarize()' que entre outras funções pode contar, filtrar, polir os dados para uma exposição específica do banco dos dados.")
+```
+
+```{r}
+resumo = estados %>% 
+ group_by(Continente) %>% 
+ summarize(n()) 
+resumo
+```
+
+```{r}
+#Select, Filter, Arrange
+
+print("'select()' é uma forma simples de selecionar as colunas com que você quer trabalhar, sem prejuízo dos dados serem excluídos do banco de dados.")
+```
+
+```{r}
+selecao = estados %>%
+ select(-Capital, -Continente)
+head(selecao)
+```
+
+```{r}
+print("'filter()' é uma função que acrescenta parâmetros a uma mêtrica que o usuário busca, neste caso, procuramos por países no continente americano com PIB superior ou igual a 1 trilhão.")
+```
+
+```{r}
+filtro = estados %>%
+ filter(Continente == "América", PIB >= 1000)
+filtro
+```
+
+```{r}
+print("Por fim, temos a função 'arrange()' que organiza dados em formato crescente 'desc()'.")
+```
+
+```{r}
+organizar_desc = estados %>%
+ arrange(desc(IDH))
+head(organizar_desc)
+```
+
+```{r}
+print("Concluímos essa amostragem de manipulação de dados. Na próxima etapa vamos trabalhar outra importante ferramenta em R, o 'ggplot2' responsável pela criação de gráficos do banco de dados.")
+```
+
