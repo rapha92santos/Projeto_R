@@ -1,0 +1,150 @@
+#Acesse os arquivos do repositório:
+#cambio_14.csv <https://bit.ly/2Hm7oFs>
+#cambio_29.csv <https://bit.ly/2HpcVeo>
+#cambio_38.csv <https://bit.ly/3dKmroi>
+#cambio_68.csv <https://bit.ly/2HoPbH8>
+#cambio_114.csv <https://bit.ly/3kmDbo4>
+#cambio_174.csv <https://bit.ly/31tTsjA>
+#cambio_204.csv <https://bit.ly/3ofypes>
+#cambio_221.csv <https://bit.ly/2ITvJmI>
+
+---
+title: "3_Formatar_dados"
+output: html_notebook
+---
+
+```{r}
+# 3 | Formatar Dados
+
+print("Sabendo criar um banco de dados, agora temos que prestar atenção com a formatação das informações. Muitas bases vêm incompletas com configurações erradas, juntas, separadas, colunas invertidas na horizontal ou vertical, comprometendo muito a integridade dos dados. Todavia, temos no limite da linguaguem R como sanar algum desses problemas. Com isso em mente vamos verificar o tema.")
+
+print("Nessa experiência vamos utilizar novamente a biblioteca 'tidyverse' fazendo uso de 'readr', 'dplyr' e 'tidyr' para leitura de diversos arquivos importados, consolidação e edição de tabela.")
+```
+
+```{r}
+library(readr)
+library(dplyr)
+library(tidyr)
+```
+
+```{r}
+# Read, List.files, lapply, Unite, Separate, Gather, Duplicated, Distinct, Spread
+
+print("Vamos trabalhar com alguns relatórios de câmbio em '.csv', contendo neles individualmente o identificador do país, mês e ano de referência, Estado e nome da moeda, preço de venda e compra em relação ao real.")
+
+print("Veja aqui um exemplo de como é um dos extratos de câmbio nesses moldes:")
+```
+```{r}
+cambio_14 = read_csv("cambio_14.csv")
+cambio_14
+```
+
+```{r}
+print("Fonte: <https://br.investing.com/currencies/exchange-rates-table>")
+
+print("Nesse momento, temos que trabalhar com mais de um arquivo ao mesmo tempo, mas em R isso não é um problema, pois utilizando o 'list.file()' conseguimos fazer uma leitura de todos simultaneamente.")
+```
+
+```{r}
+arquivos_cambio = list.files(pattern = 'cambio_.*csv')
+arquivos_cambio
+```
+```{r}
+print("Com as bases prontas, temos que organiza-lás utilizando a função 'lappy()' serve como indexador para o data frame, assim é possível junta-lós posteriomente com 'bind_rows()'.")
+```
+
+```{r}
+anexador = lapply(arquivos_cambio, read_csv)
+anexador
+```
+
+```{r}
+tabela_cambio = bind_rows(anexador)
+tabela_cambio
+```
+
+```{r}
+print("Usando 'str()' vamos verificar a estrutura dessa tabela:")
+```
+
+```{r}
+str(tabela_cambio)
+```
+
+```{r}
+print("Vamos contar quantas linhas foram ao total com 'nrow()':")
+```
+
+```{r}
+contar_linhas = nrow(tabela_cambio)
+contar_linhas
+```
+
+```{r}
+print("Nesse momento, podemeos formatar alguns dados nesse relatório. Poderiamos consolidar algumas linhas como 'Mês' e 'Ano' em uma só 'Data' para dar espaço a dados mais relevantes:")
+```
+
+```{r}
+unir = tabela_cambio %>%
+  unite(col = 'Data', Mes, Ano,
+        sep = "_")
+unir
+```
+
+```{r}
+print("Da mesma forma que podemos separar as informações 'Estado_Moeda' em duas colunas distintas com 'separate()':")
+```
+
+```{r}
+separar = unir %>%
+ separate(col = 'Estado_Moeda',
+          into = c("Estado", "Moeda"),
+          sep = "_")
+separar
+```
+
+```{r}
+print("Dependendo da necessidade é possível utilizar o 'gather()' para criar uma tabela discriminada entre chave e valores. Neste caso, usamos os dados de compra e venda como indexadores:")
+```
+
+```{r}
+juntar = separar %>%
+  gather("Venda", "Compra", key = "Tipo", value = "Preço")
+juntar
+```
+
+```{r}
+print("Deu pra notar que existem dados repetidos nessa tabela, isso porque a linha 'Inglaterra' fazia parte tanto do 'Reino Unido' como da 'União Europeia'. Vamos usar 'duplicated()' para identificar esse dado com maior precisão:")
+```
+
+```{r}
+duplicata = juntar %>% 
+  duplicated() %>%
+  table()
+duplicata
+```
+
+```{r}
+print("A função retornou dois valores 'TRUE' para duplicatas, vamos providenciar a limpeza dessa tabela com 'distinct()':")
+```
+
+```{r}
+limpar_duplicata = juntar %>%
+  distinct()
+limpar_duplicata
+```
+
+```{r}
+print("Tratar dados repetidos é sempre um passo importante para integridade dos dados. Contudo, os dados discriminados estão alongando muito a tabela, usando 'spread()' podemos voltar ao padrão consolidado:")
+```
+
+```{r}
+espalhar = limpar_duplicata %>%
+  spread("Tipo", "Preço")
+espalhar
+```
+
+```{r}
+print("Este é o fim de mais um segmento da linguaguem R, no próximo passo vamos mostrar como manipular uma base de dados.")
+```
+
