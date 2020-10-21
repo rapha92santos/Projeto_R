@@ -1,0 +1,210 @@
+#Acesse o arquivo desse repositório:
+#Estados.xls <https://bit.ly/3kpClY0>
+
+---
+title: "6_Estatística"
+output: html_notebook
+---
+
+```{r}
+# 6 | Estatística
+
+print("Neste penúltimo segmento vamos falar um pouco mais de métricas estatísticas para o aperfeiçoamento na manipulação de dados. Como de costume vamos trazer aqui as bibliotecas acrescentando duas novas, 'Desctools' para complementar o estudo estatístico da base e 'ggpubr' para expor mais de um gráfico ao mesmo tempo.")
+```
+
+```{r}
+library(readxl)
+library(tidyverse)
+library(DescTools)
+library(ggplot2)
+library(ggpubr)
+
+estados = read_excel("Estados.xls")
+head(estados)
+```
+
+```{r}
+print("Dando início ao experimento, vamos trazer de volta aqui o sumário dos dados da nossa base para entender melhor as informações estatística da nossa base, para então dermos sequência no estudo por segmento individualmente.")
+```
+
+```{r}
+sumario = estados %>% 
+ summary(estados) 
+sumario
+```
+
+```{r}
+# Média
+
+print("Média é a soma de todos os valores divididos por sua quantidade, tem o intuito de informar o valor intermediário de toda a base. Porém, é preciso ter cuidado ao usar médias, pois não refletem fielmente a realidade e tão pouco a dispersão que pode haver dos dados.")
+```
+
+```{r}
+media_IDH = mean(estados$IDH)
+media_IDH
+
+media_PIB = mean(estados$PIB)
+media_PIB
+```
+
+```{r}
+print("Para chamarmos a função 'mean()' em R, temos que primeiro apontar qual a fonte da nossa base, assim como a coluna em que se encontra os dados utilizando o símbolo cifrão '$', para então, finalmente poder executar a função e imprimir o resultado. Com o resultado da média podemos concluir que os países em geral possuem um IDH de 0.733 e PIB de 622.50, respectivamente, e que foi previamente utilizado para nossa filtragem na classificação dos países.")
+
+# Mediana
+
+print("Mediana como o próprio nome já diz, resulta no dado central da sequência númerica. Ela procura organizar os dados em ordem crescente ou decrescente para estabelecer qual deles é o termo mediano da sequência, mas, existem algumas diferenças de cálculo caso a sequência for par ou ímpar. Se for ímpar, é possível determinar um valor mediano, pois existe um intervalo de números iguais. Já sequências pares, não é possível fazer o mesmo, tendo que calcular os dois números medianos e dividir por dois.")
+```
+
+```{r}
+mediana_IDH = median(estados$IDH)
+mediana_IDH
+
+mediana_PIB = median(estados$PIB)
+mediana_PIB
+```
+
+```{r}
+print("Em R podemos usar o 'median()' para achar a mediana da base de dados e observando a nossa base temos 230 linhas um valor de número par, portanto já poderiamos pressumir que seria uma número quebrado. Com o resultado dessa mediana podemos concluir que o IDH e PIB centrais de toda a base são 0.758 e U$ 42 milhões. Valores consideravelmente diferentes da média.")
+
+# Moda
+
+print("Moda é uma forma bem simples em estatística de estabelecer qual valor é o mais usado ou recorrente em uma base de dados. Podendo apontar com alguma precisão tendências, frequência, costumes que passariam desapercebidos apenas olhando para as informações.")
+```
+
+```{r}
+moda_IDH = Mode(coluna_IDH)
+moda_IDH[1]
+
+moda_PIB = Mode(coluna_PIB)
+moda_PIB[1]
+```
+
+```{r}
+print("Com a ferramenta 'Desctools' podemos trazer na biblioteca a função 'Mode()' para a linguaguem R que tem como objetivo procura na base de dados informações semelhantes. Neste caso, podemos visualizar que o IDH mais comum é o 0.724 e o PIB mais comum é o U$ 682 mil, outro indicador significativo na dispersão dos dados, principalmente em relação ao PIB.")
+
+# Variância
+
+print("Variância é uma medida usada para identificar dispersão de dados em relação à média, quanto maior o número da variância é esperado que o resultado sejam dados mais dispersos do que se fossem com números menores.")
+```
+
+```{r}
+formula_variancia = function(x) mean((x-mean(x))^2)
+
+variancia_IDH_formula = formula_variancia(coluna_IDH)
+variancia_IDH_formula
+
+variancia_PIB_formula = formula_variancia(coluna_PIB)
+variancia_PIB_formula
+```
+
+```{r}
+print("Fonte <https://www.codecademy.com/learn/learn-r>")
+
+print("Para se calcular a variância é preciso primeiro sabermos a média, com ela subtraímos por cada dado da coluna elevando o resultado ao quadrado e dividindo pela quantidade de dados. Em R, podemos usar uma fórmula para determinar a variância recordado aqui das aulas na CodeAcademy que já vêm pronta para calcular.") 
+
+print("Com essa variância podemos concluir que, a dispersão dos dados do IDH são substancialmente menos dispersos do que os dados de PIB, visto a diferença entre os valores.")
+
+# Desvio Padrão
+
+print("Desvio padrão é um polimento da variância estabelece uma margem estipulando dispersão acima ou abaixo da média. Existe uma diferença de cálculo representada pelo símbolo sigma 'σ' para desvio padrão populacional e 's' para desvio padrão amostral.")
+
+print("Fonte: <https://bit.ly/3cHdnzZ>")
+```
+
+```{r}
+desvio_IDH = sd(coluna_IDH)
+desvio_IDH
+
+desvio_PIB = sd(coluna_PIB)
+desvio_PIB
+
+desvio_raiz_IDH = sqrt(variancia_IDH_formula)
+desvio_raiz_IDH
+
+desvio_raiz_PIB = sqrt(variancia_PIB_formula)
+desvio_raiz_PIB 
+```
+
+```{r}
+print("A fórmula do desvio padrão em R pode ser usada de duas formas, com a função 'sd()' ou fazendo a raiz quadrada da variância, ambas estão corretas, mas como pode ser visto dão resultados distintos, isso por causa da quantidade de casas decimais que estamos trabalhando.")
+
+print("Com esse desvio padrão podemos assumir que:")
+
+print("* Desvio padrão média IDH: 0.733 ± 0.155")
+print("* Desvio padrão média PIB: 622.50 ± 2405.24")
+
+print("Com essa nova informação e implementação da melhoria contínua no nosso experimento, podemos atualizar com maior precisão o gráfico dos países mais bem classificados:")
+```
+
+```{r}
+filtro_acima_sd = estados %>%
+ filter(PIB >= 3027.74, IDH >= 0.888) 
+filtro_acima_sd
+```
+
+```{r}
+# Quartil
+
+print("Quartil é uma ferramenta utilizada na estatística para fracionar os dados em quadrantes de 4 partes iguais, ele mostra como os dados estão distribuídos na base colaborando com uma percepção de dispersão. Existem variações na forma de se criar esse tipo de gráfico, podendo separar por 10 partes iguais, sendo o decil ou 100 partes iguais como o percentil, entre outros, além de trabalharem em conjunto com a mediana de cada quadrante.")
+```
+
+```{r}
+quartil = quantile(estados$IDH, c(.25, .5, .75))
+quartil
+
+grafico = ggplot(estados, aes(x=IDH)) +
+          geom_histogram(binwidth=0.01, fill="steelblue3", alpha=0.7, colour="black") +
+          geom_vline(aes(xintercept = quantile(IDH,0.25), colour="Q1"), show.legend = TRUE, linetype="solid", size=1) +
+          geom_vline(aes(xintercept = quantile(IDH,0.5), colour="Q2"), show.legend = TRUE, linetype="solid", size=1) +
+          geom_vline(aes(xintercept = quantile(IDH,0.75), colour="Q3"), show.legend = TRUE, linetype="solid", size=1) +
+          labs(title="Histogram da coluna IDH", x="Índice IDH", y="Concentração") +
+          scale_colour_manual(name="Quartis", values = c(Q1 = "red", Q2 = "OrangeRed", Q3 = "goldenrod1"), labels = c("Q1", "Q2", "Q3"))
+grafico
+```
+
+```{r}
+print("Fonte: <https://www.codecademy.com/learn/learn-r>")
+
+print("Fonte: <https://ggplot2.tidyverse.org/reference/geom_abline.html>")
+
+print("Como podemos ver com a função 'quantile()' separamos a coluna IDH em 3 pontos, com a concentração de 25% dos primeiros dados que alcançam até 0.610 do IDH. Depois os 50% dos dados, observe aqui que acaba reproduzindo a mediana com valor do IDH de 0.758 e finalmente 75% com IDH de 0.857. Podemeos concluir com uma hipótese visto que o índice IDH possuem um alcance entre 0 e 1, de que então pelo quartil 1 apenas 25% dos países estão abaixo do índice de 0.610, representando 1/4 do total, o que significa que a maior parte dos países ou 3/4 deles vivem em condições de desenvolvimento humana muito boas entre quartil 2 e quartil 3.")
+
+# IQR
+
+print("IQR ou Interquartile range representa a amplitude interquartil que tem como objetivo observar também a dispersão dos dados, porém ele foca nos dados centrais em torno da mediana. É um versão polida de medida estatística do desvio padrão e variância, enquanto o IQR leva em consideração a ordem crescente dos dados centrais. Seu cálculo é um resultado do quartil 1 menos quartil 3, e em R podemos calcular usando a função 'IQR()'.")
+```
+
+```{r}
+amplitude = max(coluna_IDH) - min(coluna_IDH)
+amplitude
+
+interquartil = IQR(coluna_IDH)
+interquartil
+```
+
+```{r}
+print("Com a amplitude calculando o máximo valor da base menos o menor valor, conseguimos identificar se a dispersão é uma incógnita prolongada por valores de exceção e mitigar esse efeito. Já o IQR vai mostrar a dispersão do primeiro quartil em relação ao quarto quartil, então comparativamente se a amplitude dos dados é de 0.621 e o IQR é 0.247 conseguimos com isso compreender melhor um boxplot desses dados:")
+```
+
+```{r}
+boxplot_Continentes = ggplot(estados, aes(x=Continente, y=IDH, fill=Continente)) +
+                      geom_boxplot(notch = TRUE) + 
+                      coord_flip() +
+                      geom_dotplot(binaxis = "y", stackdir = "center", dotsize= 0.7, binwidth = 0.015, alpha=0.7) +       
+                      labs(title = "Boxplot IDH vs Continente")
+                      
+boxplot_IDH = ggplot(estados, aes(x=coluna_IDH)) +
+              geom_boxplot(fill="royalblue2", colour="black", notch = TRUE) +              
+              geom_dotplot(binaxis = "x", stackdir = "center", dotsize= 0.8, binwidth = 0.015, fill="steelblue4", alpha=0.7) +
+              labs(title = "Boxplot IDH mundi", x="Índice IDH", y="Concentração") 
+
+ggarrange(boxplot_Continentes, boxplot_IDH, labels = c("1", "2"), ncol = 1, nrow = 2)
+```
+
+```{r}
+print("Fonte: <https://bit.ly/3iyUQHt>")
+
+print("Vamos recordar aqui o gráfico da relação entre o IDH vs Continentes, agora trazendo novos elementos estatísticos de 'boxplot()', 'dotplot()' e a biblioteca 'ggpubr' mostrando a real dispersão dos dados em conjunto com o IDH mundi que acabamos de encontrar em paralelo.")
+
+print("Com isso, chegamos ao fim do tema estatística e vamos dar sequência ao nosso último tema com o machine learning.")
+```
