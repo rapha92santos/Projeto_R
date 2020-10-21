@@ -1,0 +1,100 @@
+#Acesse o arquivo desse repositório:
+#Estados.xls <https://bit.ly/3kpClY0>
+
+---
+title: "5_ggplot2"
+output: html_notebook
+---
+
+```{r}
+# 5 | ggplot2
+
+print("Nesta nova etapa, vamos trazer uma das ferramentas mais importantes na ciência de dados que é o ggplot2. Com ele podemos construir gráficos da base de dados que criamos, tratamos, manipulamos, concluíndo assim, o ciclo da ciência de dados que tem como importante etapa a geração de estudos e conhecimento dos dados. Vamos implementar aqui o cruzamento de funções, modelos, informações para geração de conhecimento, trazendo todo o potencial que uma base de dados pode nos oferecer.")
+
+print("Começando pela bibliotecas, vamos utilizar além do 'ggplot2' outras ferramentas complementares como: 'tidyverse', 'ggrepel' e 'readxl' com propósito de leitura, manipulação e dar títulos aos dados apresentados. Com isso, vamos trazer de volta nossa base de dados dos 'Estados.xls':")
+```
+```{r}
+library(tidyverse)
+library(ggplot2)
+library(ggrepel)
+library(readxl)
+
+estados = read_excel("Estados.xls")
+head(estados)
+```
+
+```{r}
+# Dotplot, Point, Smooth, Jitter, Text_repel
+
+print("A partir daqui, com a base de dados já estruturada vamos extrair informações dos dados, usando desse conhecimento para se chegar algumas conclusões. Nesse presente estudo, o objetivo é identificar a relação de índice de desenvolvimento humano desses países com seu produto interno bruto, existe alguma relação entre IDH vs PIB desses países? E se existe, podemos classificar quais são os melhores?")
+
+print("Vamos começar traçando uma separação primária dos países, sobre sua situação de 'IDH' em relação ao seu 'Continente':")
+```
+
+```{r}
+grafico = ggplot(estados, aes(x = Continente, fill = Continente, y = IDH)) +
+          geom_dotplot(binaxis = "y", stackdir = "center", dotsize= 0.8, binwidth = 0.015) +       
+          labs(title = "Relação IDH vs Continente")
+grafico
+```
+
+```{r}
+print("Fonte: <https://ggplot2.tidyverse.org/reference/geom_dotplot.html>")
+
+print("Em 'ggplot2' a biblioteca funciona por camadas, onde se lê a base de dados através do 'readxl' e fazendo-se uso da 'aes()' ou função estética que vai ditar as características do gráfico podendo montar de diversas formas com um, dois ou até três cruzamento de dados, formatar cores, tamanhos, largura e formas.")
+
+print("Continuando, criamos este gráfico e com ele podemos responder algumas perguntas do nosso objetivo. Com o gráfico podemos concluir que os países principalmente africanos estão entre os mais subdesenvolvidos, no índice de IDH, enquanto os europeus são um dos mais desenvolvidos. Mas, somente esse gráfico não responde nossa correlação entre IDH vs PIB, que veremos a seguir:")
+```
+
+```{r}
+grafico2 = ggplot(estados, aes(x = IDH, y = PIB)) +        
+        geom_point(aes(colour=Continente)) + 
+        geom_smooth() +
+        labs(title = "Relação PIB vs IDH")
+grafico2
+```
+
+```{r}
+print("Fonte: <https://rstudio.com/wp-content/uploads/2016/03/ggplot2-cheatsheet-portuguese.pdf>")
+
+print("Com o novo gráfico estruturado entre PIB vs IDH complementa a nossa visão anterior. Utilizando o 'geom_smooth()' mostra que os países de modo geral são muito similares em questão de tamanho de PIB e IDH, e de forma até supreendetemente próximos a PIB zero. A dispersão por outro lado mostra uma disparidade de poder econômico de alguns países que despontam entre os maiores atores neste cenário global e com algumas exceções entre 0 e 5 bilhões, acima da média smooth.")
+
+print("Indo além, vamos trazer de volta o sumário dos nossos dados para verificar se temos como classificar entre todos os países quais são os mais bem classificados:")
+```
+
+```{r}
+sumario = estados %>% 
+ summary(estados) 
+sumario
+```
+
+```{r}
+print("No sumário temos que em relação ao PIB a média fica torno de 622 bilhões, nos mostra também uma importante lição quando trabalhando com dados e nossa percepção deles, como o fato de virmos que esses países se aproximam de PIB zero e agora mostrando uma realidade média tão alta, só comprova uma população muito dispersa. Outra importante lição que fica é a utilização dessas ferramentas para desmistificar a frieza dos dados e quão importante é uma ferramenta gráfica nesse quesito.") 
+
+print("Por outro lado, o sumário mostra que a média do IDH ficou em 0.733 um índice também bastante alto, mas dessa vez com a colaboração dos gráficos podemos dar um voto de confiança. Visto que o primeiro gráfico corrobora com a narrativa, mostrando muitos países acima ou em igualdade com essa linha contribuindo para o que diz de fato os dados.")
+
+print("Contudo, ainda temos que concluir nosso objetivo. É possível classficar e filtrar entre a relação de IDH vs PIB uma lista de países mais bem classificadas? Vamos utilizar o 'filter()' para sabermos mais:")
+```
+
+```{r}
+filtro = estados %>%
+ filter(PIB >= 622, IDH >= 0.733) 
+filtro
+```
+
+```{r}
+print("Usando os parâmetros do sumário construímos uma métrica para filtragem dessa base de dados e com isso podemos concluir nosso objetivo em analisar a relação entre IDH vs PIB como vamos verificar no próxmo gráfico:")
+```
+
+```{r}
+grafico3 = ggplot(filtro, aes(IDH, PIB, color = Continente)) +
+        geom_jitter() +        
+        geom_text_repel(aes(label=Países), color = "black")
+grafico3
+```
+
+```{r}
+print("Por fim, vale ressaltar que mesmo com todo o trabalho que tivemos não quer dizer que acabou. Existe sempre espaço para melhorias contínuas, aperfeiçoando as métricas e análise dos dados, como nessa base de dados, poderíamos no futuro fazer mudanças nos dados acrescentando novos valores como o índice GINI, consertar a coluna Continentes com dados geográficos mais adequados, utilizar apenas países para análise ou utilizar uma nova métrica para separação dos blocos econômicos, problemas de idioma e simbologia na configuração de uma base voltada aos padrões brasileiros ou americano.")
+
+print("Levando nós ao fim de mais um segmento da linguaguem, na próxima etapa vamos falar um pouco mais sobre estátistica e como tirar resultados melhores dos nossos dados.")
+```
