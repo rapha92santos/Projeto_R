@@ -1,0 +1,108 @@
+---
+title: "1_Intro_R"
+output: html_notebook
+---
+
+```{r}
+# || Raphael Santos || Projeto R ||  
+
+print("Bem-vindos ao Projeto R. O conteúdo desse repositório tem como objetivo explorar os meus conhecimentos adquiridos com a linguaguem R ao longo do tempo. A metodologia que será utilizada, se baseia em cursos online como Code Academy, W3schools, Tidyverse.org, CRAN, forúns especializados. Em paralelo, foi utilizado este site Kaggle para compilar os códigos que também foram criados no Rstudio e tendo início como se segue.")
+
+# 1 | Introdução em R
+
+print("Começando com a linguaguem R, temos que introduzir as formas de se trabalhar conceitos básicos como string, data types, cálculos, variáveis, condicionais, comparação, operadores lógicos.")
+
+# Data types
+
+print("Vamos começar com data types usando a função 'class()' para determinar a categoria de cada exemplo:")
+```
+
+```{r}
+#Caractere
+class("a")
+
+#Númerico
+class(5)
+
+#Inteiro
+class(2L)
+
+#Lógica
+class(TRUE)
+
+#Complexo
+class(2i + 5)
+```
+
+```{r}
+print("Fonte: <https://bit.ly/3juQLFt>")
+
+print("É com estes tipos de dados que a linguaguem R trabalha, com isso podemos avançar para construção de novas estruturas:")
+```
+
+```{r}
+#String
+string = "sou uma string"
+string
+
+#Cálculos
+calculos = 5 * 10 / 2
+calculos
+
+#Vetores
+vetor = c(1:10)
+vetor
+
+#Condicionais
+condicional_logica = "Sou uma condicional"
+condicional_logica = 
+ if (TRUE) {print("Se eu for verdade, está mensagem será impressa")
+ } else {print("Caso contrário, está mensagem será impressa")}
+
+#Comparativos
+comparacao = 100 >= 200
+comparacao
+```
+
+```{r}
+# Data Frame
+
+print("Agora passando para o data frame, um importante recurso de criação de tabelas, disposição e organização dos dados usando a linguaguem R.")
+```
+
+```{r}
+#Tabela
+tabela = matrix(1:9, nrow = 3, ncol = 3)
+tabela
+
+#Lista
+lista = list("ID", 5>10, 5+5)
+lista
+
+#Data Frame
+data = data.frame(id = 1:5, empregado = c("Paulo", "Ana", "Renato", "Bruna", "Sofia"), departamento = c("RH", "Financeiro", "Comercial", "TI", "Diretoria"))
+data
+```
+
+```{r}
+print("Com estes exemplos podemos observar a diversidade de funcionalidades que o R pode trabalhar, associando a linguaguem de máquina com ferramentas de banco de dados.")
+
+# Bibliotecas e Packages
+
+print("Agora por último vamos explorar outra importante ferramenta que complementa a linguaguem R, que é o uso de biliotecas e packages. Com o comando 'install.packages()' é possível acrescentarmos uma bilioteca com novos recursos ao R. Após a instalação do pacote é necessário, porém, chamarmos esse recurso da biblioteca, como expresso abaixo:")
+```
+
+```{r}
+#Versão Rstudio
+#install.packages(tidyverse)
+library(tidyverse)
+```
+
+```{r}
+print("Neste caso 'tidyverse' é uma das bibliotecas mais importantes usadas em R sendo um manipulador de dados, leitor, gráficos, lógica que iremos explorar mais adiante. Ele é um entre tantos outros pacotes que podem ser consultados via CRAN e suas respectivas documentações.")
+
+print("Fonte: <https://cran.r-project.org/web/packages/available_packages_by_name.html>")
+
+print("Com isso concluímos nossa introdução, na próxima etapa vamos criar uma base de dados a partir do R")
+```
+
